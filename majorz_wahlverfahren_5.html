@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Majorzwahl — Rechenbeispiel Ständerat</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAFAF8;
+    --card-bg: #FFFFFF;
+    --text: #1A1A1A;
+    --text-muted: #6B6B6B;
+    --text-hint: #9A9A9A;
+    --border: rgba(0,0,0,0.1);
+    --border-strong: rgba(0,0,0,0.18);
+    --surface: #F3F2EF;
+    --blue-bg: #E8F0FE;
+    --blue-text: #1A56DB;
+    --green-bg: #E6F4EA;
+    --green-text: #137333;
+    --purple-bg: #EDE9FE;
+    --purple-text: #5B21B6;
+    --coral-bg: #FEF0EC;
+    --coral-text: #9A3412;
+    --teal-text: #0F6E56;
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 2rem 1.5rem 4rem;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 0.25rem; }
+  .subtitle { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+  .intro-box {
+    background: var(--purple-bg);
+    border-radius: var(--radius-lg);
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 2.5rem;
+    font-size: 0.92rem;
+    color: var(--purple-text);
+    line-height: 1.65;
+  }
+  .intro-box strong { font-weight: 600; }
+  .step { margin-bottom: 2.25rem; }
+  .step-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-hint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.5rem;
+  }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th {
+    text-align: left;
+    font-weight: 500;
+    padding: 0.4rem 0.5rem;
+    border-bottom: 2px solid var(--border-strong);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  td { padding: 0.45rem 0.5rem; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  .num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+  }
+  .formula-box {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.88rem;
+    margin: 0.5rem 0;
+  }
+  .note {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin: 0.5rem 0;
+    line-height: 1.6;
+  }
+  .pill {
+    display: inline-block;
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 0.15rem 0.55rem;
+    border-radius: 6px;
+  }
+  .pill-green { background: var(--green-bg); color: var(--green-text); }
+  .badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+  }
+  .badge-green { background: var(--green-bg); color: var(--green-text); }
+  .badge-muted { background: var(--surface); color: var(--text-hint); }
+  .badge-coral { background: var(--coral-bg); color: var(--coral-text); }
+  .result-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1rem;
+  }
+  .result-item { text-align: center; min-width: 100px; }
+  .result-item .name { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
+  .result-item .label { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+  .desc { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+  .example-tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.65rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+  }
+  .tag-a { background: var(--purple-bg); color: var(--purple-text); }
+  .tag-b { background: var(--blue-bg); color: var(--blue-text); }
+  .tag-c { background: var(--coral-bg); color: var(--coral-text); }
+  .hint-box {
+    background: var(--blue-bg);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    font-size: 0.88rem;
+    color: var(--blue-text);
+    margin: 0.75rem 0 0.75rem;
+    line-height: 1.6;
+  }
+  .hint-box strong { font-weight: 600; }
+  .divider { border: none; border-top: 2px solid var(--border); margin: 2.5rem 0; }
+  .reveal-section {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.5s ease, opacity 0.4s ease, margin 0.4s ease;
+    margin-top: 0;
+  }
+  .reveal-section.show {
+    max-height: 1200px;
+    opacity: 1;
+    margin-top: 0.75rem;
+  }
+  .reveal-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.45rem 1rem;
+    font-size: 0.88rem;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--card-bg);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    margin-top: 0.5rem;
+  }
+  .reveal-btn:hover { background: var(--surface); }
+  .reveal-btn:active { transform: scale(0.98); }
+  @media (max-width: 520px) { body { padding: 1.5rem 1rem 3rem; } }
+  @media print {
+    body { padding: 1rem; max-width: none; }
+    .card { break-inside: avoid; }
+    .reveal-section { max-height: none !important; opacity: 1 !important; margin-top: 0.75rem !important; }
+    .reveal-btn { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Majorzwahl — Ständerat</h1>
+<p class="subtitle">Rechenbeispiel: Kanton X, 2 Sitze, 80'000 gültige Wahlzettel</p>
+
+<div class="intro-box">
+  <strong>So funktioniert die Majorzwahl:</strong> Gewählt ist, wer mehr als die Hälfte der abgegebenen gültigen Wahlzettel als Stimmen erhält — das sogenannte <strong>absolute Mehr</strong>. In unserem Beispiel: 80'000 ÷ 2 + 1 = <strong>40'001 Stimmen</strong>. Wer diese Hürde nicht schafft, ist nicht gewählt.
+</div>
+
+<div class="step">
+  <div class="step-label">Ausgangslage</div>
+  <div class="formula-box">Absolutes Mehr = Wahlzettel ÷ 2 + 1 = 80'000 ÷ 2 + 1 = <strong>40'001</strong></div>
+</div>
+
+<hr class="divider">
+
+<!-- BEISPIEL A -->
+<div class="step">
+  <span class="example-tag tag-a">Beispiel A</span>
+  <div class="step-label">1. Wahlgang — Wer erreicht das absolute Mehr?</div>
+  <div class="card">
+    <table>
+      <tr><th>Kandidat:in</th><th>Partei</th><th class="num">Stimmen</th></tr>
+      <tr><td>Meier Eva</td><td>Mitte</td><td class="num">42'300</td></tr>
+      <tr><td>Berger Urs</td><td>SVP</td><td class="num">38'500</td></tr>
+      <tr><td>Huber Marco</td><td>FDP</td><td class="num">31'200</td></tr>
+      <tr><td>Roth Lea</td><td>SP</td><td class="num">27'400</td></tr>
+      <tr><td>Graf Nina</td><td>Grüne</td><td class="num">14'600</td></tr>
+    </table>
+  </div>
+  <p class="desc">Absolutes Mehr: 40'001 Stimmen. Wer schafft es?</p>
+  <button class="reveal-btn" onclick="toggle('resultA1', this)">Ergebnis anzeigen</button>
+  <div class="reveal-section" id="resultA1">
+    <div class="card">
+      <table>
+        <tr><th>Kandidat:in</th><th>Partei</th><th class="num">Stimmen</th><th class="num">Status</th></tr>
+        <tr><td>Meier Eva</td><td>Mitte</td><td class="num"><span class="pill pill-green">42'300</span></td><td class="num"><span class="badge badge-green">gewählt</span></td></tr>
+        <tr><td>Berger Urs</td><td>SVP</td><td class="num">38'500</td><td class="num"><span class="badge badge-coral">2. Wahlgang</span></td></tr>
+        <tr><td>Huber Marco</td><td>FDP</td><td class="num">31'200</td><td class="num"><span class="badge badge-coral">2. Wahlgang</span></td></tr>
+        <tr><td>Roth Lea</td><td>SP</td><td class="num">27'400</td><td class="num"><span class="badge badge-coral">2. Wahlgang</span></td></tr>
+        <tr><td>Graf Nina</td><td>Grüne</td><td class="num">14'600</td><td class="num"><span class="badge badge-coral">2. Wahlgang</span></td></tr>
+      </table>
+    </div>
+    <div class="result-bar">
+      <div class="result-item"><div class="name" style="color: var(--teal-text);">Meier Eva</div><div class="label">Mitte — gewählt</div></div>
+      <div class="result-item"><div class="name" style="color: var(--text-hint);">?</div><div class="label">1 Sitz offen → 2. Wahlgang</div></div>
+    </div>
+    <div class="note">Nur Meier überschreitet 40'001. Berger (SVP) liegt auf Rang 2 — knapp vor Huber (FDP). Für den zweiten Sitz braucht es einen 2. Wahlgang.</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-label">2. Wahlgang — relatives Mehr genügt</div>
+  <p class="desc">Graf (Grüne) tritt zurück und empfiehlt Huber (FDP). Drei Kandidierende bleiben im Rennen.</p>
+  <div class="card">
+    <table>
+      <tr><th>Kandidat:in</th><th>Partei</th><th class="num">Stimmen</th></tr>
+      <tr><td>Huber Marco</td><td>FDP</td><td class="num">37'400</td></tr>
+      <tr><td>Berger Urs</td><td>SVP</td><td class="num">35'800</td></tr>
+      <tr><td>Roth Lea</td><td>SP</td><td class="num">24'300</td></tr>
+    </table>
+  </div>
+  <p class="desc">Im 2. Wahlgang reicht das relative Mehr — wer am meisten Stimmen hat, gewinnt.</p>
+  <button class="reveal-btn" onclick="toggle('resultA2', this)">Ergebnis anzeigen</button>
+  <div class="reveal-section" id="resultA2">
+    <div class="card">
+      <table>
+        <tr><th>Kandidat:in</th><th>Partei</th><th class="num">Stimmen</th><th class="num">Status</th></tr>
+        <tr><td>Huber Marco</td><td>FDP</td><td class="num"><span class="pill pill-green">37'400</span></td><td class="num"><span class="badge badge-green">gewählt</span></td></tr>
+        <tr><td>Berger Urs</td><td>SVP</td><td class="num">35'800</td><td class="num"><span class="badge badge-muted">nicht gewählt</span></td></tr>
+        <tr><td>Roth Lea</td><td>SP</td><td class="num">24'300</td><td class="num"><span class="badge badge-muted">nicht gewählt</span></td></tr>
+      </table>
+    </div>
+    <div class="result-bar">
+      <div class="result-item"><div class="name" style="color: var(--teal-text);">Meier Eva</div><div class="label">Mitte (1. Wahlgang)</div></div>
+      <div class="result-item"><div class="name" style="color: var(--blue-text);">Huber Marco</div><div class="label">FDP (2. Wahlgang)</div></div>
+    </div>
+    <div class="note">Berger (SVP) hatte nach dem 1. Wahlgang die beste Ausgangslage (Rang 2, 38'500 Stimmen) — und geht trotzdem leer aus. Die ehemaligen Grünen-Wähler:innen stimmten mehrheitlich für Huber (FDP), was ihm den entscheidenden Vorsprung verschaffte. Das zeigt die Allianzenlogik des Majorzsystems: Nicht wer im 1. Wahlgang vorne liegt gewinnt, sondern wer die breiteste Unterstützung bilden kann.</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- BEISPIEL B -->
+<div class="step">
+  <span class="example-tag tag-b">Beispiel B</span>
+  <div class="hint-box">
+    <strong>Wichtig:</strong> Weil 2 Sitze zu vergeben sind, darf jede Person bis zu <strong>2 Namen</strong> auf den Wahlzettel schreiben. Deshalb können mehrere Kandidierende gleichzeitig das absolute Mehr erreichen — etwa wenn viele Wähler:innen dieselben zwei Personen aufschreiben.
+  </div>
+  <div class="step-label">1. Wahlgang — Wer erreicht das absolute Mehr?</div>
+  <div class="card">
+    <table>
+      <tr><th>Kandidat:in</th><th>Partei</th><th class="num">Stimmen</th></tr>
+      <tr><td>Meier Eva</td><td>Mitte</td><td class="num">52'400</td></tr>
+      <tr><td>Huber Marco</td><td>FDP</td><td class="num">44'800</td></tr>
+      <tr><td>Berger Urs</td><td>SVP</td><td class="num">32'100</td></tr>
+      <tr><td>Roth Lea</td><td>SP</td><td class="num">28'500</td></tr>
+    </table>
+  </div>
+  <p class="desc">Absolutes Mehr: 40'001 Stimmen. Wer schafft es diesmal?</p>
+  <button class="reveal-btn" onclick="toggle('resultB', this)">Ergebnis anzeigen</button>
+  <div class="reveal-section" id="resultB">
+    <div class="card">
+      <table>
+        <tr><th>Kandidat:in</th><th>Partei</th><th class="num">Stimmen</th><th class="num">Status</th></tr>
+        <tr><td>Meier Eva</td><td>Mitte</td><td class="num"><span class="pill pill-green">52'400</span></td><td class="num"><span class="badge badge-green">gewählt</span></td></tr>
+        <tr><td>Huber Marco</td><td>FDP</td><td class="num"><span class="pill pill-green">44'800</span></td><td class="num"><span class="badge badge-green">gewählt</span></td></tr>
+        <tr><td>Berger Urs</td><td>SVP</td><td class="num">32'100</td><td class="num"><span class="badge badge-muted">nicht gewählt</span></td></tr>
+        <tr><td>Roth Lea</td><td>SP</td><td class="num">28'500</td><td class="num"><span class="badge badge-muted">nicht gewählt</span></td></tr>
+      </table>
+    </div>
+    <div class="result-bar">
+      <div class="result-item"><div class="name" style="color: var(--teal-text);">Meier Eva</div><div class="label">Mitte — gewählt</div></div>
+      <div class="result-item"><div class="name" style="color: var(--blue-text);">Huber Marco</div><div class="label">FDP — gewählt</div></div>
+    </div>
+    <div class="note">Beide überschreiten 40'001 — beide sind im ersten Wahlgang gewählt. Dies ist der Normalfall bei Ständeratswahlen: Moderate Kandidierende überzeugen über die Parteigrenzen hinweg.</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- BEISPIEL C -->
+<div class="step">
+  <span class="example-tag tag-c">Beispiel C</span>
+  <div class="step-label">1. Wahlgang — Wer erreicht das absolute Mehr?</div>
+  <div class="card">
+    <table>
+      <tr><th>Kandidat:in</th><th>Partei</th><th class="num">Stimmen</th></tr>
+      <tr><td>Berger Urs</td><td>SVP</td><td class="num">36'800</td></tr>
+      <tr><td>Huber Marco</td><td>FDP</td><td class="num">33'200</td></tr>
+      <tr><td>Roth Lea</td><td>SP</td><td class="num">30'100</td></tr>
+      <tr><td>Meier Eva</td><td>Mitte</td><td class="num">28'900</td></tr>
+      <tr><td>Graf Nina</td><td>Grüne</td><td class="num">22'400</td></tr>
+    </table>
+  </div>
+  <p class="desc">Absolutes Mehr: 40'001 Stimmen. Wer schafft es?</p>
+  <button class="reveal-btn" onclick="toggle('resultC1', this)">Ergebnis anzeigen</button>
+  <div class="reveal-section" id="resultC1">
+    <div class="card">
+      <table>
+        <tr><th>Kandidat:in</th><th>Partei</th><th class="num">Stimmen</th><th class="num">Status</th></tr>
+        <tr><td>Berger Urs</td><td>SVP</td><td class="num">36'800</td><td class="num"><span class="badge badge-coral">nicht gewählt</span></td></tr>
+        <tr><td>Huber Marco</td><td>FDP</td><td class="num">33'200</td><td class="num"><span class="badge badge-coral">nicht gewählt</span></td></tr>
+        <tr><td>Roth Lea</td><td>SP</td><td class="num">30'100</td><td class="num"><span class="badge badge-coral">nicht gewählt</span></td></tr>
+        <tr><td>Meier Eva</td><td>Mitte</td><td class="num">28'900</td><td class="num"><span class="badge badge-coral">nicht gewählt</span></td></tr>
+        <tr><td>Graf Nina</td><td>Grüne</td><td class="num">22'400</td><td class="num"><span class="badge badge-coral">nicht gewählt</span></td></tr>
+      </table>
+    </div>
+    <div class="result-bar" style="justify-content: center;">
+      <div class="result-item"><div class="name" style="color: var(--coral-text);">Niemand gewählt</div><div class="label">Beide Sitze offen → 2. Wahlgang</div></div>
+    </div>
+    <div class="note">Die Stimmen verteilen sich auf zu viele Kandidierende — niemand erreicht 40'001. Für beide Sitze braucht es einen 2. Wahlgang.</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-label">2. Wahlgang — relatives Mehr genügt</div>
+  <p class="desc">Graf (Grüne) tritt zurück und empfiehlt Roth (SP). Roth und Meier (Mitte) bilden eine gemeinsame Allianz gegen SVP-Kandidat Berger.</p>
+  <div class="card">
+    <table>
+      <tr><th>Kandidat:in</th><th>Partei</th><th class="num">Stimmen</th></tr>
+      <tr><td>Meier Eva</td><td>Mitte</td><td class="num">43'700</td></tr>
+      <tr><td>Roth Lea</td><td>SP</td><td class="num">40'200</td></tr>
+      <tr><td>Berger Urs</td><td>SVP</td><td class="num">39'800</td></tr>
+      <tr><td>Huber Marco</td><td>FDP</td><td class="num">30'100</td></tr>
+    </table>
+  </div>
+  <p class="desc">Im 2. Wahlgang reicht das relative Mehr — die zwei Kandidierenden mit den meisten Stimmen gewinnen die 2 Sitze.</p>
+  <button class="reveal-btn" onclick="toggle('resultC2', this)">Ergebnis anzeigen</button>
+  <div class="reveal-section" id="resultC2">
+    <div class="card">
+      <table>
+        <tr><th>Kandidat:in</th><th>Partei</th><th class="num">Stimmen</th><th class="num">Status</th></tr>
+        <tr><td>Meier Eva</td><td>Mitte</td><td class="num"><span class="pill pill-green">43'700</span></td><td class="num"><span class="badge badge-green">gewählt</span></td></tr>
+        <tr><td>Roth Lea</td><td>SP</td><td class="num"><span class="pill pill-green">40'200</span></td><td class="num"><span class="badge badge-green">gewählt</span></td></tr>
+        <tr><td>Berger Urs</td><td>SVP</td><td class="num">39'800</td><td class="num"><span class="badge badge-muted">nicht gewählt</span></td></tr>
+        <tr><td>Huber Marco</td><td>FDP</td><td class="num">30'100</td><td class="num"><span class="badge badge-muted">nicht gewählt</span></td></tr>
+      </table>
+    </div>
+    <div class="result-bar">
+      <div class="result-item"><div class="name" style="color: var(--teal-text);">Meier Eva</div><div class="label">Mitte — gewählt</div></div>
+      <div class="result-item"><div class="name" style="color: var(--coral-text);">Roth Lea</div><div class="label">SP — gewählt</div></div>
+    </div>
+    <div class="note">Berger (SVP) lag im 1. Wahlgang noch auf Rang 1 (36'800 Stimmen) — und geht trotzdem leer aus. Die Allianz aus Mitte, SP und Grünen vereint mehr Stimmen als SVP und FDP einzeln. Erneut zeigt sich: Im Majorz gewinnt nicht, wer im ersten Wahlgang vorne liegt, sondern wer die breiteste Mehrheit bilden kann.</div>
+  </div>
+</div>
+
+<script>
+function toggle(id, btn) {
+  var el = document.getElementById(id);
+  var show = el.classList.contains('show');
+  el.classList.toggle('show');
+  btn.textContent = show ? 'Ergebnis anzeigen' : 'Ergebnis ausblenden';
+}
+</script>
+
+</body>
+</html>
